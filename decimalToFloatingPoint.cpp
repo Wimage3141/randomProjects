@@ -18,12 +18,12 @@ string decimalToBinary(int d) {
     return binary;
 }
 
-// Convert fractional part to binary (64-bit precision to avoid extra padding later)
+// Convert fractional part to binary
 string fractionToBinary(string fraction) {
     fraction = "0." + fraction;
     double df = std::stod(fraction);
     string binaryFraction;
-    int n = 64;  // 64-bit precision
+    int n = 64;  // 64-bit precision to avoid extra padding late
 
     while (n--) {
         df *= 2;
@@ -34,7 +34,7 @@ string fractionToBinary(string fraction) {
             binaryFraction.push_back('0');
         }
     }
-    return binaryFraction;  // Already 64 bits; truncation will happen later
+    return binaryFraction;
 }
 
 // Convert decimal to IEEE 754 32-bit floating-point representation
@@ -42,7 +42,7 @@ string convertToFP(double decimal) {
     if (decimal == 0.0) return "0" + string(8, '0') + string(23, '0'); // Special case for zero
 
     string signBit = (decimal < 0) ? "1" : "0";
-    decimal = abs(decimal); // Work with absolute value
+    decimal = abs(decimal);
 
     int integerPart = static_cast<int>(decimal);
     double fractionalPart = decimal - integerPart;
@@ -65,21 +65,20 @@ string convertToFP(double decimal) {
         normalized = fracBinary.substr(firstOne + 1);
     }
 
-    // IEEE 754 exponent = actual exponent + 127 (bias)
+    // stored exponent = actual exponent + bias (127)
     int biasedExponent = exponent + 127;
     string exponentBits = bitset<8>(biasedExponent).to_string();
 
     // Mantissa should be exactly 23 bits (truncate excess from 64-bit fraction)
     string mantissa = normalized.substr(0, 23);
-    while (mantissa.size() < 23) mantissa.push_back('0'); // Ensure 23-bit length
+    while (mantissa.size() < 23) mantissa.push_back('0');
 
-    // Assemble final IEEE 754 32-bit binary string
+    // final IEEE 754 32-bit binary string!
     return signBit + exponentBits + mantissa;
 }
 
-// Main function to test
 int main() {
-    double num = 25.375; // Example input
+    double num = -0.175571;
     cout << "IEEE 754 Representation: " << convertToFP(num) << endl;
     return 0;
 }
